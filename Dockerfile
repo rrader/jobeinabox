@@ -74,6 +74,9 @@ RUN --mount=type=secret,id=api_keys \
     sed -i 's/ServerSignature\ On/ServerSignature \Off/g' /etc/apache2/conf-enabled/security.conf && \
     rm /etc/apache2/sites-enabled/000-default.conf && \
     mv /000-jobe.conf /etc/apache2/sites-enabled/ && \
+    sed -i 's/upload_max_filesize = .*/upload_max_filesize = 50M/' /etc/php/*/apache2/php.ini && \
+    sed -i 's/post_max_size = .*/post_max_size = 51M/' /etc/php/*/apache2/php.ini && \
+    sed -i 's/memory_limit = .*/memory_limit = 256M/' /etc/php/*/apache2/php.ini && \
     mkdir -p /var/crash && \
     chmod 777 /var/crash && \
     echo '<!DOCTYPE html><html lang="en"><title>Jobe</title><h1>Jobe</h1></html>' > /var/www/html/index.html && \
@@ -84,6 +87,7 @@ RUN --mount=type=secret,id=api_keys \
         sed -i 's/$require_api_keys = false/$require_api_keys = true/' /var/www/html/jobe/app/Config/Jobe.php && \
         sed -i "s/'2AAA7A.*/$API_KEYS/" /var/www/html/jobe/app/Config/Jobe.php \
     ; fi && \
+    sed -i 's/public int $jobe_max_users = 8;/public int $jobe_max_users = 18;/' /var/www/html/jobe/app/Config/Jobe.php && \
     /usr/bin/python3 /var/www/html/jobe/install --max_uid=500 && \
     chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html && \
     apt-get -y autoremove --purge && \
